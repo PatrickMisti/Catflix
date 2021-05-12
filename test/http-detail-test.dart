@@ -1,4 +1,4 @@
-import 'file:///C:/Home/Github/Catflix/catflix/lib/controller/detail-controller.dart';
+import 'package:catflix/controller/detail-controller.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -48,9 +48,11 @@ class Detail extends StatelessWidget {
                 if(snapshot.connectionState == ConnectionState.done) {
                   return snapshot.data != null
                       ? Container(
-                          child: DetailOs(
+                          child: new DetailOs(
                               buttonList: snapshot.data as List<String>,
-                              choiceStream: (String name) => detailController.getSeriesFromButtonStream(name).asBroadcastStream(),
+                              choiceStream: (String name) {
+                                return detailController.getSeriesFromButtonStream(name);
+                              },
                               platform: platform),
                               width: MediaQuery.of(context).size.width,
                               margin: EdgeInsets.symmetric(horizontal: 10),)

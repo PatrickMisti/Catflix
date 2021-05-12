@@ -1,82 +1,106 @@
-import 'package:catflix/utilities/Observer.dart';
+import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class DetailOs extends StatelessWidget {
+
+class DetailOs extends StatelessWidget{
+  final Function choiceStream;
   final List<String> buttonList;
   final TargetPlatform platform;
-  final Color _buttonColors = Colors.teal;
-  final TextStyle _buttonForeStyle = TextStyle(color: CupertinoColors.white, fontSize: 18);
-  final Function choiceStream;
 
   DetailOs({required this.buttonList, required this.choiceStream, required this.platform});
 
-  CupertinoButton buttonStyleIos(String name) {
-    return CupertinoButton(
-      color: _buttonColors,
-      onPressed: () {
-        List<Map<String,String>> items = <Map<String,String>>[];
-        modalObserver(items, name);
+
+  final Color _buttonColors = Colors.teal;
+  final TextStyle _buttonForeStyle = TextStyle(color: CupertinoColors.white, fontSize: 18);
+
+  Future<void> showIosPopUp(context, List<Map> list) {
+    return showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+            color: CupertinoColors.white.withOpacity(0.2),
+            height: 250,
+            child: CupertinoPicker(
+                itemExtent: 30,
+                onSelectedItemChanged: (index) {},//todo
+                children: List.generate(list.length, (index) {
+                  List<String> convertedTextArray = list[index].keys.first.split('|');
+                  String convertedText = "Season ${convertedTextArray[1]} Episode ${convertedTextArray[2]}";
+                  return Text(convertedText, style: TextStyle(color: Colors.white));
+                })
+            ));
       },
-      child: Center(
-        child: Text(
-          name,
-          style: _buttonForeStyle,
-        ),
-      ),
     );
   }
 
-  showIosPopUp(context,List<Map<String, String>> series) {
-    return showCupertinoModalPopup(context: context,
+  Future<void> showAndroidPopUp(context, List<Map> list){
+    return showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.white.withOpacity(0.2),
         builder: (BuildContext context) {
           return Container(
-            color: CupertinoColors.white,
-            height: 300,
-            child: CupertinoPicker(
-                /*scrollController: FixedExtentScrollController(
-                    initialItem: video.indexOf(video
-                        .where((element) => element.episodeId == widget._detailManager.getCurrentEpisode().episodeId)
-                        .first)),*/
-                itemExtent: 30,
-                onSelectedItemChanged: (index) {
-                  /*setState(() {
-                    widget._detailManager.setCurrentEpisode(video[index]);
-                  });*/
-                },
-                children: new List<Widget>.generate(series.length, (index) => Text(series[index].keys.first))),
+            height: 350,
+            child: ListView.builder(
+              itemCount: list.length,
+              itemBuilder: (context, index) {
+                List<String> convertedTextArray = list[index].keys.first.split('|');
+                String convertedText = "Season ${convertedTextArray[1]} Episode ${convertedTextArray[2]}";
+                return ListTile( //todo
+                  title: Center(child: Text(convertedText,style: TextStyle(color: Colors.white),)),
+                );
+              },
+            ),
           );
-        });
+        },
+    );
   }
 
+  CupertinoButton buttonStyleIos(context, String name) {
+    return CupertinoButton(
+      color: _buttonColors,
+      onPressed: () => _onPressedFunction(context,TargetPlatform.iOS,name),
+      child: _buttonStyleText(name)
+    );
+  }
 
-  ElevatedButton buttonStyleAndroid(String name) {
+  ElevatedButton buttonStyleAndroid(context, String name) {
     return ElevatedButton(
-        onPressed: (){
-          List<Map<String,String>> items = <Map<String,String>>[];
-          modalObserver(items, name);
-        },
-        child: Center(
-          child: Text(
-            name,
-            style: _buttonForeStyle,
-          ),
-        ),
+        onPressed: () => _onPressedFunction(context,TargetPlatform.android,name),
+        child: _buttonStyleText(name),
       style: ButtonStyle(backgroundColor: MaterialStateProperty.all(_buttonColors)),
     );
   }
 
+  _onPressedFunction (context,TargetPlatform platform, String name) {
+    List<Map> items = <Map>[];
+    Stream stream = choiceStream(name);
 
-  modalObserver(List<Map<String,String>> items,String name) {
-    return Observer<Map<String,String>>(
-        stream: choiceStream(name),
-        onSuccess: (context, Map<String,String> item) {
-          items.add(item);
-          showIosPopUp(context, items);
-        },
-        onWaiting: platform
-    );
+    StreamSubscription streamSubscription = stream.listen((event) => null);
+
+    streamSubscription.onData((data) {
+      items.add(data);
+    });
+
+    streamSubscription.onDone(() {
+      if (platform == TargetPlatform.iOS)
+        showIosPopUp(context,items).then((value) {
+          streamSubscription.cancel();
+          items = <Map>[];
+        });
+
+      else
+        showAndroidPopUp(context, items).then((value) {
+          streamSubscription.cancel();
+          items = <Map>[];
+        });
+    });
+
+
+    //showIosPopUp(context, )
   }
+
+  Center _buttonStyleText (String name) => Center(child: Text(name,style: _buttonForeStyle));
 
   @override
   Widget build(BuildContext context) {
@@ -87,8 +111,8 @@ class DetailOs extends StatelessWidget {
               child: Container(
                 margin: EdgeInsets.symmetric(horizontal: 7,vertical: 10),
                 child: platform == TargetPlatform.iOS
-                    ? buttonStyleIos(name)
-                    : buttonStyleAndroid(name)
+                    ? buttonStyleIos(context,name)
+                    : buttonStyleAndroid(context,name)
               ));
         })
     );
