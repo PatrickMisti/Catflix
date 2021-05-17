@@ -69,4 +69,44 @@ class DetailController{
     Map json = jsonDecode(jsonStringRaw)['a'];
     return json;
   }
+
+  // url = https://serien.sx/serie/stream/fate-the-winx-saga/staffel-1/episode-1
+  Future<List<Map>> getHostAndLanguageForSeries(String url) async{
+
+    List<Map<String,dynamic>> manager = <Map<String, dynamic>>[];
+    Document html = parse(await HttpService.httpClient(url));
+    
+    List<Element> links = html
+        .getElementsByClassName("hosterSiteVideo")[0]
+        .getElementsByClassName("row")[0]
+        .getElementsByTagName("li");
+
+    List<Map<String,dynamic>> linkTarget = links.map((e) {
+      return {
+        "langKey": e.attributes['data-lang-key'],
+        "dataLink": _streamUrl + e.attributes['data-link-target'].toString()
+      };
+    }).toList();
+
+    List<Element> language = html
+        .getElementsByClassName("changeLanguageBox")[0]
+        .getElementsByTagName("img");
+
+    manager = language.map((item) {
+
+      List<String> links = <String>[];
+
+      for(var element in linkTarget)
+        if(int.parse(element['langKey']) == int.parse(item.attributes['data-lang-key'].toString()))
+          links.add(element['dataLink']);
+
+
+      return {
+        "images": _streamUrl + item.attributes['src'].toString(),
+        "langKey": int.parse(item.attributes['data-lang-key'].toString()),
+        "link": links
+      };
+    }).toList();
+    return manager;
+  }
 }

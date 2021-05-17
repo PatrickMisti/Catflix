@@ -2,6 +2,7 @@ import 'package:catflix/controller/detail-controller.dart';
 import 'package:catflix/database/entities/series.dart';
 import 'package:catflix/os_controller/detail-os.dart';
 import 'package:catflix/provider.dart';
+import 'package:catflix/view/detail/hosted-url-series.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -60,7 +61,8 @@ class Detail extends StatelessWidget {
                 }
                 return Container(height: 50,child: Center(child: CupertinoActivityIndicator()));
               },
-            )
+            ),
+            HostedUrlToSeries()
           ],
         ),
       ),
