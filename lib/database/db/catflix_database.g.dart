@@ -84,7 +84,7 @@ class _$CatflixDatabase extends CatflixDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Series` (`seriesId` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `photoUrl` TEXT, `season` INTEGER NOT NULL, `episode` INTEGER NOT NULL, `movie` INTEGER NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Series` (`seriesId` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL, `url` TEXT NOT NULL, `photoUrl` TEXT, `currentSeriesName` TEXT NOT NULL, `currentSeriesUrl` TEXT NOT NULL)');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Category` (`categoryId` INTEGER PRIMARY KEY AUTOINCREMENT, `name` TEXT NOT NULL)');
         await database.execute(
@@ -124,9 +124,8 @@ class _$SeriesDao extends SeriesDao {
                   'name': item.name,
                   'url': item.url,
                   'photoUrl': item.photoUrl,
-                  'season': item.season,
-                  'episode': item.episode,
-                  'movie': item.movie
+                  'currentSeriesName': item.currentSeriesName,
+                  'currentSeriesUrl': item.currentSeriesUrl
                 },
             changeListener),
         _seriesUpdateAdapter = UpdateAdapter(
@@ -138,9 +137,8 @@ class _$SeriesDao extends SeriesDao {
                   'name': item.name,
                   'url': item.url,
                   'photoUrl': item.photoUrl,
-                  'season': item.season,
-                  'episode': item.episode,
-                  'movie': item.movie
+                  'currentSeriesName': item.currentSeriesName,
+                  'currentSeriesUrl': item.currentSeriesUrl
                 },
             changeListener);
 
@@ -162,9 +160,8 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
@@ -177,9 +174,8 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
@@ -194,9 +190,8 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
@@ -208,9 +203,8 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
@@ -222,9 +216,8 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
@@ -236,15 +229,14 @@ class _$SeriesDao extends SeriesDao {
             name: row['name'] as String,
             url: row['url'] as String,
             photoUrl: row['photoUrl'] as String?,
-            season: row['season'] as int,
-            episode: row['episode'] as int,
-            movie: row['movie'] as int));
+            currentSeriesName: row['currentSeriesName'] as String,
+            currentSeriesUrl: row['currentSeriesUrl'] as String));
   }
 
   @override
   Future<void> deleteSeries(int id) async {
-    await _queryAdapter
-        .queryNoReturn('Delete from Series where seriesId = ?', arguments: [id]);
+    await _queryAdapter.queryNoReturn('Delete from Series where seriesId = ?',
+        arguments: [id]);
   }
 
   @override

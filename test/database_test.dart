@@ -37,12 +37,12 @@ void main() {
 
       expectLater(dbSeries.name, series.name,reason: "Series name is not same");
 
-      dbSeries.setInitWatching(episode: 1,season: 5);
+      dbSeries.setInitWatching(currentName: "Series|1|5",currentUrl: "/jlfksdakfl/jklasd");
       await database.seriesDb.updateSeries(dbSeries);
       Series newDbSeries = (await database.seriesDb.findSeriesByName("%Haik%"))!.first;   //todo change in db %
 
       expectLater(newDbSeries.name, series.name, reason: "Updated series name is not right");
-      expectLater(newDbSeries.season, 5, reason: "Season from series is not same");
+      expectLater(newDbSeries.currentSeriesName, "Series|1|5" , reason: "Season from series is not same");
 
       List<Series> list = await database.seriesDb.getAllSeries();
 
@@ -110,11 +110,3 @@ void main() {
     });
   });
 }
-
-/*test("test example for hoster",() {
-      List<Map<int,String>> season = new List.generate(5, (index) {
-        return {
-          index: "hallo$index"
-        };
-      });
-    });*/

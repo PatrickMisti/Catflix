@@ -12,6 +12,8 @@ class DetailController{
     buttons = new Map<String,dynamic>();
   }
 
+  String get streamOriginalUrl => this._streamUrl;
+
   void dispose() => buttons.clear();
 
   Future<List<String>> getButtonTextWithUrl(String url) async {
@@ -44,7 +46,7 @@ class DetailController{
       int episode = 0;
       for (Map item in seriesMapList) {
         episode++;
-        yield {"$key|$episode":item['href']};
+        yield {"$key|$episode":_streamUrl + item['href']};
       }
     }
   }
@@ -71,7 +73,7 @@ class DetailController{
   }
 
   // url = https://serien.sx/serie/stream/fate-the-winx-saga/staffel-1/episode-1
-  Future<List<Map>> getHostAndLanguageForSeries(String url) async{
+  static Future<List<Map>> getHostAndLanguageForSeries(String url,String original) async{
 
     List<Map<String,dynamic>> manager = <Map<String, dynamic>>[];
     Document html = parse(await HttpService.httpClient(url));
@@ -82,9 +84,13 @@ class DetailController{
         .getElementsByTagName("li");
 
     List<Map<String,dynamic>> linkTarget = links.map((e) {
+      List aRef = e.getElementsByTagName('h4');
+      String i = aRef[0].nodes.first.text!;
+
       return {
         "langKey": e.attributes['data-lang-key'],
-        "dataLink": _streamUrl + e.attributes['data-link-target'].toString()
+        "dataLink": original + e.attributes['data-link-target'].toString(),
+        "name": i
       };
     }).toList();
 
@@ -94,15 +100,15 @@ class DetailController{
 
     manager = language.map((item) {
 
-      List<String> links = <String>[];
+      List<Map> links = <Map>[];
 
       for(var element in linkTarget)
         if(int.parse(element['langKey']) == int.parse(item.attributes['data-lang-key'].toString()))
-          links.add(element['dataLink']);
+          links.add(element);
 
 
       return {
-        "images": _streamUrl + item.attributes['src'].toString(),
+        "images": original + item.attributes['src'].toString(),
         "langKey": int.parse(item.attributes['data-lang-key'].toString()),
         "link": links
       };
