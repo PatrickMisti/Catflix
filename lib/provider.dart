@@ -18,6 +18,9 @@ class Provider extends InheritedWidget {
   @override
   bool updateShouldNotify(covariant Provider old) => db != old.db;
 
+  Future<Series> getSeriesById(int id) async => (await db.seriesDb.findSeriesById(id))!;
+
+  Future<void> updateSeries(Series series) async  => await db.seriesDb.updateSeries(series);
 
   Stream<List<Category>> get getCategoryStream => db.categoryDb.getAllCategoryByStream().asBroadcastStream();
 

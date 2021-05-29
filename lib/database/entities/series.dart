@@ -7,16 +7,14 @@ class Series {
   final String name;
   final String url;
   final String? photoUrl;
-  int season;
-  int episode;
-  int movie;
+  String currentSeriesName = "";
+  String currentSeriesUrl = "";
 
-  Series({this.seriesId, required this.name, required this.url, this.photoUrl, this.season = 0, this.episode = 0, this.movie = 0});
+  Series({this.seriesId, required this.name, required this.url, this.photoUrl, this.currentSeriesName = "", this.currentSeriesUrl = ""});
 
-  void setInitWatching({int season = 0, int episode = 0, int movie = 0}) {
-    this.season = season;
-    this.episode = episode;
-    this.movie = movie;
+  void setInitWatching({required String currentName, required String currentUrl}) {
+    this.currentSeriesUrl = currentUrl;
+    this.currentSeriesName = currentName;
   }
 
   Map<String, dynamic> toMap() {
@@ -25,9 +23,8 @@ class Series {
       'name': name,
       'url': url,
       'photoUrl': photoUrl,
-      'season': season,
-      'episode': episode,
-      'movie': movie
+      'currentSeriesName': currentSeriesName,
+      'currentSeriesUrl': currentSeriesUrl
     };
   }
 
@@ -36,7 +33,6 @@ class Series {
         name = data['name'],
         url = data['url'],
         photoUrl = data['photoUrl'],
-        season = data['season'],
-        episode = data['episode'],
-        movie = data['movie'];
+        currentSeriesUrl = data['currentSeriesUrl'],
+        currentSeriesName = data['currentSeriesName'];
 }
